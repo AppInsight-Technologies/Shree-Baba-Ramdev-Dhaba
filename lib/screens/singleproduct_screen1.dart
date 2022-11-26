@@ -718,7 +718,7 @@ class _SingleproductScreenState extends State<SingleproductScreen>
   Future<String> createShareLink(String singleProduct, String productID) async {
     // debugPrint("yes..."+store.singelproduct!.itemFeaturedImage.toString());
     final DynamicLinkParameters dynamicLinkParameters = DynamicLinkParameters(
-      uriPrefix: 'https://gbay.page.link',
+      uriPrefix: 'https://shreebabaramdevdhaba.page.link',
       link: Uri.parse(
           '${IConstants.AppDomain}/store/product/$singleProduct/$productID'),
       androidParameters: AndroidParameters(

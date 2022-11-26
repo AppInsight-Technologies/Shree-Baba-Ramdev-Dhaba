@@ -2149,8 +2149,7 @@ class _HeaderState extends State<Header> with Navigations {
                                         return Padding(
                                           padding:
                                               const EdgeInsets.only(left: 5.0),
-                                          child: Expanded(
-                                            child: GestureDetector(
+                                          child:  GestureDetector(
                                               behavior:
                                                   HitTestBehavior.translucent,
                                               onTap: () async {
@@ -2195,7 +2194,7 @@ class _HeaderState extends State<Header> with Navigations {
                                                 ),
                                               ),
                                             ),
-                                          ),
+
                                         );
                                       }),
                                 ],
