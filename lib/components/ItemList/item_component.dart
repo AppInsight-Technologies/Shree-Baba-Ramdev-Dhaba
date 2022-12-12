@@ -17,6 +17,7 @@ import '../../../models/newmodle/cartModle.dart';
 import '../../../models/newmodle/product_data.dart';
 import '../../../models/newmodle/user.dart';
 import '../../../components/login_web.dart';
+import '../../helper/custome_checker.dart';
 import '../../rought_genrator.dart';
 import '../../widgets/productWidget/item_badge.dart';
 import '../../widgets/productWidget/item_variation.dart';
@@ -71,47 +72,47 @@ class _ItemsState extends State<Itemsv2> with Navigations {
     // _checkmembership?widget._itemdata.priceVariation[itemindex].membershipPrice:widget._itemdata.priceVariation[itemindex].price
     (Vx.isWeb && !ResponsiveLayout.isSmallScreen(context))
         ? showDialog(
-            context: context,
-            builder: (context) {
-              return StatefulBuilder(builder: (context, setState) {
-                return Dialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3.0)),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2.5,
-                    //height: 200,
-                    padding: EdgeInsets.fromLTRB(30, 20, 20, 20),
-                    child: ItemVariation(
-                      itemdata: widget._itemdata,
-                      ismember: _checkmembership,
-                      selectedindex: itemindex,
-                      onselect: (i) {
-                        setState(() {
-                          itemindex = i;
-                          // Navigator.of(context).pop();
-                        });
-                      },
-                    ),
-                  ),
-                );
-              });
-            }).then((_) => setState(() {}))
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3.0)),
+              child: Container(
+                width: MediaQuery.of(context).size.width / 2.5,
+                //height: 200,
+                padding: EdgeInsets.fromLTRB(30, 20, 20, 20),
+                child: ItemVariation(
+                  itemdata: widget._itemdata,
+                  ismember: _checkmembership,
+                  selectedindex: itemindex,
+                  onselect: (i) {
+                    setState(() {
+                      itemindex = i;
+                      // Navigator.of(context).pop();
+                    });
+                  },
+                ),
+              ),
+            );
+          });
+        }).then((_) => setState(() {}))
         : showModalBottomSheet<dynamic>(
-            isScrollControlled: true,
-            context: context,
-            builder: (context) {
-              return ItemVariation(
-                itemdata: widget._itemdata,
-                ismember: _checkmembership,
-                selectedindex: itemindex,
-                onselect: (i) {
-                  setState(() {
-                    itemindex = i;
-                    // Navigator.of(context).pop();
-                  });
-                },
-              );
-            }).then((_) => setState(() {}));
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return ItemVariation(
+            itemdata: widget._itemdata,
+            ismember: _checkmembership,
+            selectedindex: itemindex,
+            onselect: (i) {
+              setState(() {
+                itemindex = i;
+                // Navigator.of(context).pop();
+              });
+            },
+          );
+        }).then((_) => setState(() {}));
   }
 
   @override
@@ -120,25 +121,25 @@ class _ItemsState extends State<Itemsv2> with Navigations {
     const double top1 = 130;
     final double height = ResponsiveLayout.isSmallScreen(context)
         ? Features.btobModule
-            ? 430
-            : (Features.isSubscription)
-                ? 230
-                : 230
+        ? 430
+        : (Features.isSubscription)
+        ? 230
+        : 230
         : ResponsiveLayout.isMediumScreen(context)
-            ? Features.btobModule
-                ? 430
-                : (Features.isSubscription)
-                    ? 230
-                    : 230
-            : Features.btobModule
-                ? 430
-                : (Features.isSubscription)
-                    ? 230
-                    : 230;
+        ? Features.btobModule
+        ? 430
+        : (Features.isSubscription)
+        ? 230
+        : 230
+        : Features.btobModule
+        ? 430
+        : (Features.isSubscription)
+        ? 230
+        : 230;
 
     if (productBox
-            .where((element) => element.itemId == widget._itemdata.id)
-            .count() >=
+        .where((element) => element.itemId == widget._itemdata.id)
+        .count() >=
         1) {
       debugPrint("count...1");
       for (int i = 0; i < productBox.length; i++) {
@@ -161,10 +162,10 @@ class _ItemsState extends State<Itemsv2> with Navigations {
 
     final isVeg = (widget._itemdata.vegType == "standard") ?? false;
     final isNonVeg = (widget._itemdata.vegType == "fish" ||
-            widget._itemdata.vegType == "meat") ??
+        widget._itemdata.vegType == "meat") ??
         false;
 
-    double margins = (widget._itemdata.type == "1")
+    /*  double margins = (widget._itemdata.type == "1")
         ? Calculate().getmargin(
             widget._itemdata.mrp,
             VxState.store.userData.membership! == "0" ||
@@ -194,85 +195,135 @@ class _ItemsState extends State<Itemsv2> with Navigations {
         "..." +
         widget._itemdata.unit.toString() +
         "...." +
-        widget._itemdata.eligibleForExpress.toString());
+        widget._itemdata.eligibleForExpress.toString());*/
+    String _membershipSavings = "";
+    String _priceDisplay = "";
+    String _mrpDisplay = "";
+    String _mrp = "0";
+    String _price = "0";
+    bool _isSingleSKU = widget._itemdata.type == "1" ? true : false;
+
+    if(Check().checkmembership()) { //Membered user
+      if(_isSingleSKU ? widget._itemdata.membershipDisplay! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].membershipDisplay!){ //Eligible to display membership price
+        _priceDisplay = _isSingleSKU ? widget._itemdata.membershipPrice! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].membershipPrice!;
+        _mrpDisplay = _isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!;
+        _mrp = _mrpDisplay;
+        _membershipSavings = (double.parse(_isSingleSKU ? widget._itemdata.mrp! :
+        widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!) - double.parse(_isSingleSKU ? widget._itemdata.membershipPrice! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].membershipPrice!)).toStringAsFixed(IConstants.decimaldigit);
+      } else if(_isSingleSKU ? widget._itemdata.discointDisplay! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].discointDisplay!){ //Eligible to display discounted price
+        _priceDisplay = _isSingleSKU ? widget._itemdata.price! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].price!;
+        _mrpDisplay = _isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!;
+        _mrp = _mrpDisplay;
+        _membershipSavings = (double.parse(_isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!) - double.parse(_isSingleSKU ? widget._itemdata.price! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].price!)).toStringAsFixed(IConstants.decimaldigit);
+
+      } else { //Otherwise display mrp
+        _priceDisplay = _isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!;
+        _mrp = _priceDisplay;
+      }
+    } else { //Non membered user
+      if(_isSingleSKU ? widget._itemdata.discointDisplay! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].discointDisplay!){ //Eligible to display discounted price
+        _priceDisplay = _isSingleSKU ? widget._itemdata.price! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].price!;
+        _mrpDisplay = _isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!;
+        _mrp = _mrpDisplay;
+      } else { //Otherwise display mrp
+        _priceDisplay = _isSingleSKU ? widget._itemdata.mrp! : widget._itemdata.priceVariation![Features.btobModule ? _groupValue : itemindex].mrp!;
+        _mrp = _priceDisplay;
+      }
+    }
+    _price = _priceDisplay;
+    if(Features.iscurrencyformatalign) {
+      _priceDisplay = '${double.parse(_priceDisplay).toStringAsFixed(IConstants.decimaldigit)} ' + IConstants.currencyFormat;
+      if(_mrpDisplay != "")
+        _mrpDisplay = '${double.parse(_mrpDisplay).toStringAsFixed(IConstants.decimaldigit)} ' + IConstants.currencyFormat;
+      if(_membershipSavings != "")
+        _membershipSavings = '${double.parse(_membershipSavings).toStringAsFixed(IConstants.decimaldigit)} ' + IConstants.currencyFormat;
+    } else {
+      _priceDisplay = IConstants.currencyFormat + '${double.parse(_priceDisplay).toStringAsFixed(IConstants.decimaldigit)} ';
+      if(_mrpDisplay != "")
+        _mrpDisplay =  IConstants.currencyFormat + '${double.parse(_mrpDisplay).toStringAsFixed(IConstants.decimaldigit)} ';
+      if(_membershipSavings != "")
+        _membershipSavings =  IConstants.currencyFormat + '${double.parse(_membershipSavings).toStringAsFixed(IConstants.decimaldigit)} ';
+    }
+
+    double margins = Calculate().getmargin(_mrp, _price);
     return widget._itemdata.type == "1"
         ? Card(
-            elevation: 1,
-            margin: EdgeInsets.all(5),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(40),
-              topRight: Radius.circular(15),
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            )),
-            child: Container(
-              width: _checkmembership ? 210 : 220.0,
-              decoration: BoxDecoration(
-                  color: ColorCodes.backgroundcolor,
-                  borderRadius: BorderRadius.all(Radius.circular(18)),
-                  border: Border.all(color: ColorCodes.backgroundcolor)),
-              //height: MediaQuery.of(context).size.height,//aaaaaaaaaaaaaaaaaa
-              child: Container(
-                //   margin: EdgeInsets.only(left: 10.0, top: 5.0, right: 2.0, bottom: 5.0),
-                decoration: new BoxDecoration(
-                    color: Colors.white,
-                    //border: Border.all(color: Colors.black26),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey[300]!,
-                          blurRadius: 10.0,
-                          offset: Offset(0.0, 0.50)),
-                    ],
-                    borderRadius: new BorderRadius.all(
-                      const Radius.circular(8.0),
-                    )),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: 8,
-                        ),
-                        ItemBadge(
-                          outOfStock: widget._itemdata.stock! <= 0
-                              ? OutOfStock(
-                                  singleproduct: false,
-                                )
-                              : null,
-                          badgeDiscount:
-                              BadgeDiscounts(value: margins.toStringAsFixed(0)),
-                          /*  widgetBadge: WidgetBadge(isdisplay: true,child: widget._itemdata.eligibleForExpress=="0"?Padding(
+      elevation: 1,
+      margin: EdgeInsets.all(5),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(15),
+            bottomLeft: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          )),
+      child: Container(
+        width: _checkmembership ? 210 : 220.0,
+        decoration: BoxDecoration(
+            color: ColorCodes.backgroundcolor,
+            borderRadius: BorderRadius.all(Radius.circular(18)),
+            border: Border.all(color: ColorCodes.backgroundcolor)),
+        //height: MediaQuery.of(context).size.height,//aaaaaaaaaaaaaaaaaa
+        child: Container(
+          //   margin: EdgeInsets.only(left: 10.0, top: 5.0, right: 2.0, bottom: 5.0),
+          decoration: new BoxDecoration(
+              color: Colors.white,
+              //border: Border.all(color: Colors.black26),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey[300]!,
+                    blurRadius: 10.0,
+                    offset: Offset(0.0, 0.50)),
+              ],
+              borderRadius: new BorderRadius.all(
+                const Radius.circular(8.0),
+              )),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                children: [
+                  SizedBox(
+                    height: 8,
+                  ),
+                  ItemBadge(
+                    outOfStock: widget._itemdata.stock! <= 0
+                        ? OutOfStock(
+                      singleproduct: false,
+                    )
+                        : null,
+                    badgeDiscount:
+                    BadgeDiscounts(value: margins.toStringAsFixed(0)),
+                    /*  widgetBadge: WidgetBadge(isdisplay: true,child: widget._itemdata.eligibleForExpress=="0"?Padding(
                       padding: EdgeInsets.only(right: 5.0,),
                       child: Image.asset(Images.express,
                         height: 20.0,
                         width: 25.0,),
                     ):SizedBox.shrink()),*/
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: () {
-                                  debugPrint("single product...." +
-                                      {
-                                        "itemid": widget._itemdata.id,
-                                        "itemname": widget._itemdata.itemName,
-                                        "itemimg":
-                                            widget._itemdata.itemFeaturedImage,
-                                        "eligibleforexpress":
-                                            widget._itemdata.eligibleForExpress,
-                                        "delivery": widget._itemdata.delivery,
-                                        "duration": widget._itemdata.duration,
-                                        "durationType": widget._itemdata
-                                            .deliveryDuration.durationType,
-                                        "note": widget
-                                            ._itemdata.deliveryDuration.note,
-                                        "fromScreen": widget._fromScreen,
-                                      }.toString());
-                                  /*     Navigator.of(context).pushNamed(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            debugPrint("single product...." +
+                                {
+                                  "itemid": widget._itemdata.id,
+                                  "itemname": widget._itemdata.itemName,
+                                  "itemimg":
+                                  widget._itemdata.itemFeaturedImage,
+                                  "eligibleforexpress":
+                                  widget._itemdata.eligibleForExpress,
+                                  "delivery": widget._itemdata.delivery,
+                                  "duration": widget._itemdata.duration,
+                                  "durationType": widget._itemdata
+                                      .deliveryDuration.durationType,
+                                  "note": widget
+                                      ._itemdata.deliveryDuration.note,
+                                  "fromScreen": widget._fromScreen,
+                                }.toString());
+                            /*     Navigator.of(context).pushNamed(
                                 SingleproductScreen.routeName,
                                 arguments: {
                                   "itemid": widget._itemdata.id.toString(),
@@ -286,161 +337,161 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                   "fromScreen":widget._fromScreen,
                                 });*/
 
-                                  // debugPrint("varid......"+widget._itemdata.priceVariation![itemindex].id.toString());
-                                  Navigation(context,
-                                      name: Routename.SingleProduct,
-                                      navigatore: NavigatoreTyp.Push,
-                                      parms: {
-                                        "varid": widget._itemdata.id.toString(),
-                                        "productId": widget._itemdata.id!
-                                      });
-                                },
-                                child: ClipRRect(
-                                  //margin: EdgeInsets.only(top: 10.0, bottom: 8.0),
-                                  borderRadius: BorderRadius.circular(22.0),
-                                  child: CachedNetworkImage(
-                                    imageUrl:
-                                        widget._itemdata.itemFeaturedImage,
-                                    errorWidget: (context, url, error) =>
-                                        Image.asset(
-                                      Images.defaultProductImg,
-                                      //width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      //height: height, //ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                    ),
-                                    placeholder: (context, url) => Image.asset(
-                                      Images.defaultProductImg,
-                                      //width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      // height: ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                    ),
-                                    // width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                    // height: ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                    //  fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    widget._itemdata.eligibleForExpress == "0"
-                        ? Padding(
-                            padding: EdgeInsets.only(right: 5.0, left: 10),
-                            child: Container(
-                              width: 80,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(3),
-                                border:
-                                    Border.all(color: ColorCodes.greenColor),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Express",
-                                    style: TextStyle(
-                                        fontSize: 9,
-                                        color: ColorCodes.checkmarginColor),
-                                  ),
+                            // debugPrint("varid......"+widget._itemdata.priceVariation![itemindex].id.toString());
+                            Navigation(context,
+                                name: Routename.SingleProduct,
+                                navigatore: NavigatoreTyp.Push,
+                                parms: {
+                                  "varid": widget._itemdata.id.toString(),
+                                  "productId": widget._itemdata.id!
+                                });
+                          },
+                          child: ClipRRect(
+                            //margin: EdgeInsets.only(top: 10.0, bottom: 8.0),
+                            borderRadius: BorderRadius.circular(22.0),
+                            child: CachedNetworkImage(
+                              imageUrl:
+                              widget._itemdata.itemFeaturedImage,
+                              errorWidget: (context, url, error) =>
                                   Image.asset(
-                                    Images.express,
-                                    height: 20.0,
-                                    width: 25.0,
+                                    Images.defaultProductImg,
+                                    //width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                                    //height: height, //ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
                                   ),
-                                ],
+                              placeholder: (context, url) => Image.asset(
+                                Images.defaultProductImg,
+                                //width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                                // height: ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
                               ),
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        // Expanded(
-                        //   child: Text(
-                        //     widget._itemdata.brand!,
-                        //     style: TextStyle(
-                        //         fontSize: ResponsiveLayout.isSmallScreen(context) ? 10 : ResponsiveLayout.isMediumScreen(context) ? 12 : 13,
-                        //         color: ColorCodes.lightGreyColor,fontWeight: FontWeight.bold
-                        //     ),
-                        //   ),
-                        // ),
-                        // SizedBox(
-                        //   width: 10.0,
-                        // ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 35,
-                            child: Text(
-                              widget._itemdata.itemName!,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  fontSize: ResponsiveLayout.isSmallScreen(
-                                          context)
-                                      ? 12
-                                      : ResponsiveLayout.isMediumScreen(context)
-                                          ? 13
-                                          : 15,
-                                  fontWeight: FontWeight.bold),
+                              // width: ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                              // height: ResponsiveLayout.isSmallScreen(context) ? 80 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                              //  fit: BoxFit.fill,
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: 5.0,
-                        ),
-                        Features.isSubscription &&
-                                widget._itemdata.eligibleForSubscription == "0"
-                            ? Container(
-                                height: 40,
-                                width: (Vx.isWeb) ? 60 : 85,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 0, right: 5.0),
-                                  child: CustomeStepper(
-                                    itemdata: widget._itemdata,
-                                    from: "item_screen",
-                                    height: (Features.isSubscription) ? 90 : 60,
-                                    issubscription: "Subscribe",
-                                    addon: (widget._itemdata.addon!.length > 0)
-                                        ? widget._itemdata.addon![0]
-                                        : null,
-                                    index: itemindex,
-                                    ismember: _checkmembership,
-                                    selectedindex: itemindex,
-                                    onselect: (i) {
-                                      setState(() {
-                                        itemindex = i;
-                                        // Navigator.of(context).pop();
-                                      });
-                                    },
-                                  ),
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                      ],
+                      ),
                     ),
-                    // Spacer(),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              widget._itemdata.eligibleForExpress == "0"
+                  ? Padding(
+                padding: EdgeInsets.only(right: 5.0, left: 10),
+                child: Container(
+                  width: 80,
+                  height: 25,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    border:
+                    Border.all(color: ColorCodes.greenColor),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Express",
+                        style: TextStyle(
+                            fontSize: 9,
+                            color: ColorCodes.checkmarginColor),
+                      ),
+                      Image.asset(
+                        Images.express,
+                        height: 20.0,
+                        width: 25.0,
+                      ),
+                    ],
+                  ),
+                ),
+              )
+                  : SizedBox.shrink(),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  // Expanded(
+                  //   child: Text(
+                  //     widget._itemdata.brand!,
+                  //     style: TextStyle(
+                  //         fontSize: ResponsiveLayout.isSmallScreen(context) ? 10 : ResponsiveLayout.isMediumScreen(context) ? 12 : 13,
+                  //         color: ColorCodes.lightGreyColor,fontWeight: FontWeight.bold
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   width: 10.0,
+                  // ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 35,
+                      child: Text(
+                        widget._itemdata.itemName!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontSize: ResponsiveLayout.isSmallScreen(
+                                context)
+                                ? 12
+                                : ResponsiveLayout.isMediumScreen(context)
+                                ? 13
+                                : 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5.0,
+                  ),
+                  Features.isSubscription &&
+                      widget._itemdata.eligibleForSubscription == "0"
+                      ? Container(
+                    height: 40,
+                    width: (Vx.isWeb) ? 60 : 85,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 0, right: 5.0),
+                      child: CustomeStepper(
+                        itemdata: widget._itemdata,
+                        from: "item_screen",
+                        height: (Features.isSubscription) ? 90 : 60,
+                        issubscription: "Subscribe",
+                        addon: (widget._itemdata.addon!.length > 0)
+                            ? widget._itemdata.addon![0]
+                            : null,
+                        index: itemindex,
+                        ismember: _checkmembership,
+                        selectedindex: itemindex,
+                        onselect: (i) {
+                          setState(() {
+                            itemindex = i;
+                            // Navigator.of(context).pop();
+                          });
+                        },
+                      ),
+                    ),
+                  )
+                      : SizedBox.shrink(),
+                ],
+              ),
+              // Spacer(),
 
-                    Row(
-                      children: <Widget>[
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        /*VxBuilder(
+              Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  /*VxBuilder(
                     mutations: {ProductMutation},
                     builder: (context, GroceStore box, _) {
                       if(VxState.store.userData.membership! == "1"){
@@ -502,147 +553,147 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                       );
                     },
                   ),*/
-                        Spacer(),
-                        if (Features.isLoyalty)
-                          if (double.parse(
-                                  widget._itemdata.loyalty.toString()) >
-                              0)
-                            Container(
-                              height: 18,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    Images.coinImg,
-                                    height: 13.0,
-                                    width: 20.0,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    widget._itemdata.loyalty.toString(),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12),
-                                  ),
-                                ],
-                              ),
+                  Spacer(),
+                  if (Features.isLoyalty)
+                    if (double.parse(
+                        widget._itemdata.loyalty.toString()) >
+                        0)
+                      Container(
+                        height: 18,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              Images.coinImg,
+                              height: 13.0,
+                              width: 20.0,
                             ),
-                        SizedBox(width: 10)
-                      ],
-                    ),
-                    SizedBox(
-                      height: 2,
-                    ),
-                    (Features.netWeight && widget._itemdata.vegType == "fish")
-                        ? Row(
-                            children: [
-                              SizedBox(
-                                width: 8.0,
-                              ),
-                              Text(
-                                Features.iscurrencyformatalign
-                                    ? "Whole Uncut:" +
-                                        " " +
-                                        widget._itemdata.salePrice! +
-                                        IConstants.currencyFormat +
-                                        " / " +
-                                        "500 G"
-                                    : "Whole Uncut:" +
-                                        " " +
-                                        IConstants.currencyFormat +
-                                        widget._itemdata.salePrice! +
-                                        " / " +
-                                        "500 G",
-                                style: new TextStyle(
-                                    fontSize:
-                                        ResponsiveLayout.isSmallScreen(context)
-                                            ? 10
-                                            : ResponsiveLayout.isMediumScreen(
-                                                    context)
-                                                ? 11
-                                                : 11,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 10.0,
-                              ),
-                            ],
-                          )
-                        : SizedBox.shrink(),
-                    /* SizedBox(
+                            SizedBox(width: 4),
+                            Text(
+                              widget._itemdata.loyalty.toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                  SizedBox(width: 10)
+                ],
+              ),
+              SizedBox(
+                height: 2,
+              ),
+              (Features.netWeight && widget._itemdata.vegType == "fish")
+                  ? Row(
+                children: [
+                  SizedBox(
+                    width: 8.0,
+                  ),
+                  Text(
+                    Features.iscurrencyformatalign
+                        ? "Whole Uncut:" +
+                        " " +
+                        widget._itemdata.salePrice! +
+                        IConstants.currencyFormat +
+                        " / " +
+                        "500 G"
+                        : "Whole Uncut:" +
+                        " " +
+                        IConstants.currencyFormat +
+                        widget._itemdata.salePrice! +
+                        " / " +
+                        "500 G",
+                    style: new TextStyle(
+                        fontSize:
+                        ResponsiveLayout.isSmallScreen(context)
+                            ? 10
+                            : ResponsiveLayout.isMediumScreen(
+                            context)
+                            ? 11
+                            : 11,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                ],
+              )
+                  : SizedBox.shrink(),
+              /* SizedBox(
                 height: 10,
               ),*/
-                    (Features.netWeight && widget._itemdata.vegType == "fish")
-                        ? SizedBox(
-                            height: 2,
-                          )
-                        : /*SizedBox(
+              (Features.netWeight && widget._itemdata.vegType == "fish")
+                  ? SizedBox(
+                height: 2,
+              )
+                  : /*SizedBox(
                 height: 2,
               )*/
-                        SizedBox.shrink(),
-                    (Features.netWeight && widget._itemdata.vegType == "fish")
-                        ? Row(children: [
-                            SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    "G Weight:" +
-                                        " " +
-                                        /*'$weight '*/ widget._itemdata.weight!,
-                                    style: new TextStyle(
-                                        fontSize: ResponsiveLayout
-                                                .isSmallScreen(context)
-                                            ? 10
-                                            : ResponsiveLayout.isMediumScreen(
-                                                    context)
-                                                ? 11
-                                                : 11,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            SizedBox(width: 5),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                    "N Weight:" +
-                                        " " +
-                                        /*'$netWeight '*/ widget
-                                            ._itemdata.netWeight!,
-                                    style: new TextStyle(
-                                        fontSize: ResponsiveLayout
-                                                .isSmallScreen(context)
-                                            ? 10
-                                            : ResponsiveLayout.isMediumScreen(
-                                                    context)
-                                                ? 11
-                                                : 11,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            SizedBox(width: 10),
-                          ])
-                        : SizedBox.shrink(),
-                    SizedBox(
-                      height: 18,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(width: 10),
-                        Text(
-                          widget._itemdata.singleshortNote.toString(),
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: ColorCodes.greyColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    /*       ( widget._itemdata.priceVariation!.length > 1)
+              SizedBox.shrink(),
+              (Features.netWeight && widget._itemdata.vegType == "fish")
+                  ? Row(children: [
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        "G Weight:" +
+                            " " +
+                            /*'$weight '*/ widget._itemdata.weight!,
+                        style: new TextStyle(
+                            fontSize: ResponsiveLayout
+                                .isSmallScreen(context)
+                                ? 10
+                                : ResponsiveLayout.isMediumScreen(
+                                context)
+                                ? 11
+                                : 11,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                        "N Weight:" +
+                            " " +
+                            /*'$netWeight '*/ widget
+                            ._itemdata.netWeight!,
+                        style: new TextStyle(
+                            fontSize: ResponsiveLayout
+                                .isSmallScreen(context)
+                                ? 10
+                                : ResponsiveLayout.isMediumScreen(
+                                context)
+                                ? 11
+                                : 11,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                SizedBox(width: 10),
+              ])
+                  : SizedBox.shrink(),
+              SizedBox(
+                height: 18,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10),
+                  Text(
+                    widget._itemdata.singleshortNote.toString(),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: ColorCodes.greyColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              /*       ( widget._itemdata.priceVariation!.length > 1)
                   ? Features.btobModule?
               Container(
                 // height: 200,
@@ -887,148 +938,148 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                       )
                   )
               ):*/
-                    // Row(
-                    //   children: [
-                    //     SizedBox(
-                    //       width: 13.0,
-                    //     ),
-                    //     Expanded(
-                    //       child: Container(
-                    //         decoration: BoxDecoration(
-                    //             color: ColorCodes.whiteColor,
-                    //             // border: Border.all(color: ColorCodes.greenColor),
-                    //             borderRadius: new BorderRadius.only(
-                    //               topLeft: const Radius.circular(2.0),
-                    //               topRight: const Radius.circular(2.0),
-                    //               bottomLeft: const Radius.circular(2.0),
-                    //               bottomRight: const Radius.circular(2.0),
-                    //             )),
-                    //         height: 10,
-                    //         padding: EdgeInsets.fromLTRB(5.0, 4.5, 0.0, 4.5),
-                    //         child: SizedBox.shrink(),
-                    //       ),
-                    //     ),
-                    //     SizedBox(
-                    //       width: 10.0,
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(height: 5),
-                    //
-                    //  (Features.isSubscription)?(widget._itemdata.eligibleForSubscription == "0")?
-                    //  MouseRegion(
-                    //    cursor: SystemMouseCursors.click,
-                    //    child: (widget._itemdata.priceVariation![itemindex].stock !<= 0) ?
-                    //    SizedBox(height: 30,)
-                    //        :GestureDetector(
-                    //      onTap: () {
-                    // //TODO: on click subscribe
-                    //        if(!PrefUtils.prefs!.containsKey("apikey"))
-                    //        if(kIsWeb&&  !ResponsiveLayout.isSmallScreen(context)){
-                    //          LoginWeb(context,result: (sucsess){
-                    //            if(sucsess){
-                    //              Navigator.of(context).pop();
-                    //              Navigator.pushNamedAndRemoveUntil(
-                    //                  context, HomeScreen.routeName, (route) => false);
-                    //            }else{
-                    //              Navigator.of(context).pop();
-                    //            }
-                    //          });
-                    //        }else{
-                    //          Navigator.of(context).pushNamed(
-                    //            SignupSelectionScreen.routeName,
-                    //          );
-                    //        }else{
-                    //          Navigator.of(context).pushNamed(
-                    //              SubscribeScreen.routeName,
-                    //              arguments: {
-                    //                "itemid": widget._itemdata.id,
-                    //                "itemname": widget._itemdata.itemName,
-                    //                "itemimg": widget._itemdata.itemFeaturedImage,
-                    //                "varname": widget._itemdata.priceVariation![itemindex].variationName!+widget._itemdata.priceVariation![itemindex].unit!,
-                    //                "varmrp":widget._itemdata.priceVariation![itemindex].mrp,
-                    //                "varprice":  widget._customerDetail.membership=="1" ? widget._itemdata.priceVariation![itemindex].membershipPrice.toString():widget._itemdata.priceVariation![itemindex].discointDisplay! ?widget._itemdata.priceVariation![itemindex].price.toString():widget._itemdata.priceVariation![itemindex].mrp.toString(),
-                    //                "paymentMode": widget._itemdata.paymentMode,
-                    //                "cronTime": widget._itemdata.subscriptionSlot![0].cronTime,
-                    //                "name": widget._itemdata.subscriptionSlot![0].name,
-                    //                "varid":widget._itemdata.priceVariation![itemindex].id,
-                    //                "brand": widget._itemdata.brand
-                    //              }
-                    //          );
-                    //        }
-                    //      },
-                    //      child: Row(
-                    //        children: [
-                    //          SizedBox(
-                    //            width: 10,
-                    //          ),
-                    //          Expanded(
-                    //            child: Container(
-                    //              height: 30.0,
-                    //              decoration: new BoxDecoration(
-                    //                  color: ColorCodes.whiteColor,
-                    //                  border: Border.all(color: Theme.of(context).primaryColor),
-                    //                  borderRadius: new BorderRadius.only(
-                    //                    topLeft: const Radius.circular(2.0),
-                    //                    topRight:
-                    //                    const Radius.circular(2.0),
-                    //                    bottomLeft:
-                    //                    const Radius.circular(2.0),
-                    //                    bottomRight:
-                    //                    const Radius.circular(2.0),
-                    //                  )),
-                    //              child: Row(
-                    //                mainAxisAlignment: MainAxisAlignment.center,
-                    //                crossAxisAlignment: CrossAxisAlignment.center,
-                    //                children: [
-                    //
-                    //                  Text(
-                    //                    S .of(context).subscribe,//'SUBSCRIBE',
-                    //                    style: TextStyle(
-                    //                        color: Theme.of(context).primaryColor,
-                    //                        fontSize: 12, fontWeight: FontWeight.bold),
-                    //                    textAlign: TextAlign.center,
-                    //                  ),
-                    //                ],
-                    //              ) ,
-                    //            ),
-                    //          ),
-                    //          SizedBox(
-                    //            width: 10,
-                    //          ),
-                    //        ],
-                    //      ),
-                    //    ),
-                    //  ):SizedBox(height: 30,):SizedBox.shrink(),
-                    //  SizedBox(
-                    //    height: 8,
-                    //  ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 10, /*right:10.0*/
-                      ),
-                      child: Container(
-                          //  height:50,
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          VxBuilder(
-                            mutations: {ProductMutation},
-                            builder: (context, box, _) {
-                              if (VxState.store.userData.membership! == "1") {
-                                _checkmembership = true;
-                              } else {
-                                _checkmembership = false;
-                                for (int i = 0; i < productBox.length; i++) {
-                                  if (productBox[i].mode == "1") {
-                                    _checkmembership = true;
-                                  }
+              // Row(
+              //   children: [
+              //     SizedBox(
+              //       width: 13.0,
+              //     ),
+              //     Expanded(
+              //       child: Container(
+              //         decoration: BoxDecoration(
+              //             color: ColorCodes.whiteColor,
+              //             // border: Border.all(color: ColorCodes.greenColor),
+              //             borderRadius: new BorderRadius.only(
+              //               topLeft: const Radius.circular(2.0),
+              //               topRight: const Radius.circular(2.0),
+              //               bottomLeft: const Radius.circular(2.0),
+              //               bottomRight: const Radius.circular(2.0),
+              //             )),
+              //         height: 10,
+              //         padding: EdgeInsets.fromLTRB(5.0, 4.5, 0.0, 4.5),
+              //         child: SizedBox.shrink(),
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       width: 10.0,
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: 5),
+              //
+              //  (Features.isSubscription)?(widget._itemdata.eligibleForSubscription == "0")?
+              //  MouseRegion(
+              //    cursor: SystemMouseCursors.click,
+              //    child: (widget._itemdata.priceVariation![itemindex].stock !<= 0) ?
+              //    SizedBox(height: 30,)
+              //        :GestureDetector(
+              //      onTap: () {
+              // //TODO: on click subscribe
+              //        if(!PrefUtils.prefs!.containsKey("apikey"))
+              //        if(kIsWeb&&  !ResponsiveLayout.isSmallScreen(context)){
+              //          LoginWeb(context,result: (sucsess){
+              //            if(sucsess){
+              //              Navigator.of(context).pop();
+              //              Navigator.pushNamedAndRemoveUntil(
+              //                  context, HomeScreen.routeName, (route) => false);
+              //            }else{
+              //              Navigator.of(context).pop();
+              //            }
+              //          });
+              //        }else{
+              //          Navigator.of(context).pushNamed(
+              //            SignupSelectionScreen.routeName,
+              //          );
+              //        }else{
+              //          Navigator.of(context).pushNamed(
+              //              SubscribeScreen.routeName,
+              //              arguments: {
+              //                "itemid": widget._itemdata.id,
+              //                "itemname": widget._itemdata.itemName,
+              //                "itemimg": widget._itemdata.itemFeaturedImage,
+              //                "varname": widget._itemdata.priceVariation![itemindex].variationName!+widget._itemdata.priceVariation![itemindex].unit!,
+              //                "varmrp":widget._itemdata.priceVariation![itemindex].mrp,
+              //                "varprice":  widget._customerDetail.membership=="1" ? widget._itemdata.priceVariation![itemindex].membershipPrice.toString():widget._itemdata.priceVariation![itemindex].discointDisplay! ?widget._itemdata.priceVariation![itemindex].price.toString():widget._itemdata.priceVariation![itemindex].mrp.toString(),
+              //                "paymentMode": widget._itemdata.paymentMode,
+              //                "cronTime": widget._itemdata.subscriptionSlot![0].cronTime,
+              //                "name": widget._itemdata.subscriptionSlot![0].name,
+              //                "varid":widget._itemdata.priceVariation![itemindex].id,
+              //                "brand": widget._itemdata.brand
+              //              }
+              //          );
+              //        }
+              //      },
+              //      child: Row(
+              //        children: [
+              //          SizedBox(
+              //            width: 10,
+              //          ),
+              //          Expanded(
+              //            child: Container(
+              //              height: 30.0,
+              //              decoration: new BoxDecoration(
+              //                  color: ColorCodes.whiteColor,
+              //                  border: Border.all(color: Theme.of(context).primaryColor),
+              //                  borderRadius: new BorderRadius.only(
+              //                    topLeft: const Radius.circular(2.0),
+              //                    topRight:
+              //                    const Radius.circular(2.0),
+              //                    bottomLeft:
+              //                    const Radius.circular(2.0),
+              //                    bottomRight:
+              //                    const Radius.circular(2.0),
+              //                  )),
+              //              child: Row(
+              //                mainAxisAlignment: MainAxisAlignment.center,
+              //                crossAxisAlignment: CrossAxisAlignment.center,
+              //                children: [
+              //
+              //                  Text(
+              //                    S .of(context).subscribe,//'SUBSCRIBE',
+              //                    style: TextStyle(
+              //                        color: Theme.of(context).primaryColor,
+              //                        fontSize: 12, fontWeight: FontWeight.bold),
+              //                    textAlign: TextAlign.center,
+              //                  ),
+              //                ],
+              //              ) ,
+              //            ),
+              //          ),
+              //          SizedBox(
+              //            width: 10,
+              //          ),
+              //        ],
+              //      ),
+              //    ),
+              //  ):SizedBox(height: 30,):SizedBox.shrink(),
+              //  SizedBox(
+              //    height: 8,
+              //  ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 10, /*right:10.0*/
+                ),
+                child: Container(
+                  //  height:50,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        VxBuilder(
+                          mutations: {ProductMutation},
+                          builder: (context, box, _) {
+                            if (VxState.store.userData.membership! == "1") {
+                              _checkmembership = true;
+                            } else {
+                              _checkmembership = false;
+                              for (int i = 0; i < productBox.length; i++) {
+                                if (productBox[i].mode == "1") {
+                                  _checkmembership = true;
                                 }
                               }
-                              return Row(
-                                children: <Widget>[
-                                  /* if(Features.isMembership)
+                            }
+                            return Row(
+                              children: <Widget>[
+                                /* if(Features.isMembership)
                                   _checkmembership?Container(
                                     width: 10.0,
                                     height: 9.0,
@@ -1039,51 +1090,51 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                     ),
                                   ):SizedBox.shrink(),*/
 
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      new RichText(
-                                        text: new TextSpan(
-                                          style: new TextStyle(
-                                            fontSize: ResponsiveLayout
-                                                    .isSmallScreen(context)
-                                                ? 12
-                                                : ResponsiveLayout
-                                                        .isMediumScreen(context)
-                                                    ? 13
-                                                    : 14,
-                                            color: Colors.black,
-                                          ),
-                                          children: <TextSpan>[
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    new RichText(
+                                      text: new TextSpan(
+                                        style: new TextStyle(
+                                          fontSize: ResponsiveLayout
+                                              .isSmallScreen(context)
+                                              ? 12
+                                              : ResponsiveLayout
+                                              .isMediumScreen(context)
+                                              ? 13
+                                              : 14,
+                                          color: Colors.black,
+                                        ),
+                                        children: <TextSpan>[
 //                            if(varmemberprice.toString() == varmrp.toString())
-                                            new TextSpan(
-                                                text: Features
+                                          new TextSpan(
+                                              text: _priceDisplay,/*Features
                                                         .iscurrencyformatalign
                                                     ? '${_checkmembership ? widget._itemdata.membershipPrice : widget._itemdata.price} ' +
                                                         IConstants
                                                             .currencyFormat
                                                     : IConstants
                                                             .currencyFormat +
-                                                        '${_checkmembership ? widget._itemdata.membershipPrice : widget._itemdata.price} ',
-                                                style: new TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _checkmembership
-                                                      ? ColorCodes.greenColor
-                                                      : Colors.black,
-                                                  fontSize: ResponsiveLayout
-                                                          .isSmallScreen(
-                                                              context)
-                                                      ? 12
-                                                      : ResponsiveLayout
-                                                              .isMediumScreen(
-                                                                  context)
-                                                          ? 13
-                                                          : 14,
-                                                )),
-                                            new TextSpan(
-                                                text: widget._itemdata.price !=
+                                                        '${_checkmembership ? widget._itemdata.membershipPrice : widget._itemdata.price} ',*/
+                                              style: new TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: _checkmembership
+                                                    ? ColorCodes.greenColor
+                                                    : Colors.black,
+                                                fontSize: ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context)
+                                                    ? 12
+                                                    : ResponsiveLayout
+                                                    .isMediumScreen(
+                                                    context)
+                                                    ? 13
+                                                    : 14,
+                                              )),
+                                          new TextSpan(
+                                              text: _mrpDisplay,/*widget._itemdata.price !=
                                                         widget._itemdata.mrp
                                                     ? Features
                                                             .iscurrencyformatalign
@@ -1093,197 +1144,197 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                                         : IConstants
                                                                 .currencyFormat +
                                                             '${widget._itemdata.mrp} '
-                                                    : "",
-                                                style: TextStyle(
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
-                                                  fontSize: ResponsiveLayout
-                                                          .isSmallScreen(
-                                                              context)
-                                                      ? 12
-                                                      : ResponsiveLayout
-                                                              .isMediumScreen(
-                                                                  context)
-                                                          ? 13
-                                                          : 14,
-                                                )),
-                                            TextSpan(
-                                                text: (widget._itemdata.unit ==
-                                                            null ||
-                                                        widget._itemdata.unit ==
-                                                            "")
-                                                    ? ""
-                                                    : " /" +
-                                                        widget._itemdata.unit
-                                                            .toString(),
-                                                style: TextStyle(
-                                                  fontSize: ResponsiveLayout
-                                                          .isSmallScreen(
-                                                              context)
-                                                      ? 11
-                                                      : ResponsiveLayout
-                                                              .isMediumScreen(
-                                                                  context)
-                                                          ? 12
-                                                          : 13,
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                      _checkmembership
-                                          ? Text(
-                                              "Membership Price",
+                                                    : "",*/
                                               style: TextStyle(
-                                                  color: ColorCodes.greenColor,
-                                                  fontSize: 7),
-                                            )
-                                          : SizedBox.shrink(),
+                                                decoration: TextDecoration
+                                                    .lineThrough,
+                                                fontSize: ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context)
+                                                    ? 12
+                                                    : ResponsiveLayout
+                                                    .isMediumScreen(
+                                                    context)
+                                                    ? 13
+                                                    : 14,
+                                              )),
+                                          TextSpan(
+                                              text: (widget._itemdata.unit ==
+                                                  null ||
+                                                  widget._itemdata.unit ==
+                                                      "")
+                                                  ? ""
+                                                  : " /" +
+                                                  widget._itemdata.unit
+                                                      .toString(),
+                                              style: TextStyle(
+                                                fontSize: ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context)
+                                                    ? 11
+                                                    : ResponsiveLayout
+                                                    .isMediumScreen(
+                                                    context)
+                                                    ? 12
+                                                    : 13,
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                    _checkmembership
+                                        ? Text(
+                                      "Membership Price",
+                                      style: TextStyle(
+                                          color: ColorCodes.greenColor,
+                                          fontSize: 7),
+                                    )
+                                        : SizedBox.shrink(),
+                                  ],
+                                ),
+                                Spacer(),
+                                _checkmembership
+                                    ? (int.parse(widget._itemdata.mrp!) -
+                                    int.parse(widget._itemdata
+                                        .membershipPrice!)) >
+                                    0
+                                    ? Container(
+                                  height: 22,
+                                  // width: 80,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      right: BorderSide(
+                                          width: 5.0,
+                                          color:
+                                          ColorCodes.darkgreen),
+                                      // bottom: BorderSide(width: 16.0, color: Colors.lightBlue.shade900),
+                                    ),
+                                    color: ColorCodes.varcolor,
+                                  ),
+
+                                  child: Row(
+//                        mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text("Membership Savings ",
+                                          style: TextStyle(
+                                              fontSize: 8.5,
+                                              color: ColorCodes
+                                                  .darkgreen,
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                      Text(
+                                          Features.iscurrencyformatalign
+                                              ? (int.parse(widget._itemdata.mrp!) -
+                                              int.parse(widget
+                                                  ._itemdata
+                                                  .membershipPrice!))
+                                              .toString() +
+                                              IConstants
+                                                  .currencyFormat
+                                              : IConstants.currencyFormat +
+                                              (int.parse(widget._itemdata.mrp!) -
+                                                  int.parse(widget
+                                                      ._itemdata
+                                                      .membershipPrice!))
+                                                  .toString() /*+ " " +S.of(context).membership_price*/,
+                                          style: TextStyle(
+                                              fontSize: 8.5,
+                                              /*fontWeight: FontWeight.bold,*/ color:
+                                          ColorCodes
+                                              .darkgreen,
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                      SizedBox(width: 5),
                                     ],
                                   ),
-                                  Spacer(),
-                                  _checkmembership
-                                      ? (int.parse(widget._itemdata.mrp!) -
-                                                  int.parse(widget._itemdata
-                                                      .membershipPrice!)) >
-                                              0
-                                          ? Container(
-                                              height: 22,
-                                              // width: 80,
-                                              decoration: BoxDecoration(
-                                                border: Border(
-                                                  right: BorderSide(
-                                                      width: 5.0,
-                                                      color:
-                                                          ColorCodes.darkgreen),
-                                                  // bottom: BorderSide(width: 16.0, color: Colors.lightBlue.shade900),
-                                                ),
-                                                color: ColorCodes.varcolor,
-                                              ),
-
-                                              child: Row(
-//                        mainAxisAlignment: MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Text("Membership Savings ",
-                                                      style: TextStyle(
-                                                          fontSize: 8.5,
-                                                          color: ColorCodes
-                                                              .darkgreen,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  Text(
-                                                      Features.iscurrencyformatalign
-                                                          ? (int.parse(widget._itemdata.mrp!) -
-                                                                      int.parse(widget
-                                                                          ._itemdata
-                                                                          .membershipPrice!))
-                                                                  .toString() +
-                                                              IConstants
-                                                                  .currencyFormat
-                                                          : IConstants.currencyFormat +
-                                                              (int.parse(widget._itemdata.mrp!) -
-                                                                      int.parse(widget
-                                                                          ._itemdata
-                                                                          .membershipPrice!))
-                                                                  .toString() /*+ " " +S.of(context).membership_price*/,
-                                                      style: TextStyle(
-                                                          fontSize: 8.5,
-                                                          /*fontWeight: FontWeight.bold,*/ color:
-                                                              ColorCodes
-                                                                  .darkgreen,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  SizedBox(width: 5),
-                                                ],
-                                              ),
-                                            )
-                                          : SizedBox.shrink()
-                                      : Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 5.0),
-                                          child: VxBuilder(
-                                            mutations: {SetCartItem},
-                                            builder: (context, box,
-                                                index) {
-                                              return Column(
-                                                children: [
-                                                  if (Features.isMembership &&
-                                                      int.parse(widget._itemdata
-                                                              .membershipPrice
-                                                              .toString()) >
-                                                          0)
-                                                    Row(
-                                                      children: <Widget>[
-                                                        !_checkmembership
-                                                            ? widget._itemdata
-                                                                    .membershipDisplay!
-                                                                ? GestureDetector(
-                                                                    onTap: () {
-                                                                      if (!PrefUtils
-                                                                          .prefs!
-                                                                          .containsKey(
-                                                                              "apikey")) {
-                                                                        if (kIsWeb &&
-                                                                            !ResponsiveLayout.isSmallScreen(context)) {
-                                                                          LoginWeb(
-                                                                              context,
-                                                                              result: (sucsess) {
-                                                                            if (sucsess) {
-                                                                              Navigator.of(context).pop();
-                                                                              /* Navigator.pushNamedAndRemoveUntil(
+                                )
+                                    : SizedBox.shrink()
+                                    : Padding(
+                                  padding:
+                                  const EdgeInsets.only(right: 5.0),
+                                  child: VxBuilder(
+                                    mutations: {SetCartItem},
+                                    builder: (context, box,
+                                        index) {
+                                      return Column(
+                                        children: [
+                                          if (Features.isMembership &&
+                                              int.parse(widget._itemdata
+                                                  .membershipPrice
+                                                  .toString()) >
+                                                  0)
+                                            Row(
+                                              children: <Widget>[
+                                                !_checkmembership
+                                                    ? widget._itemdata
+                                                    .membershipDisplay!
+                                                    ? GestureDetector(
+                                                  onTap: () {
+                                                    if (!PrefUtils
+                                                        .prefs!
+                                                        .containsKey(
+                                                        "apikey")) {
+                                                      if (kIsWeb &&
+                                                          !ResponsiveLayout.isSmallScreen(context)) {
+                                                        LoginWeb(
+                                                            context,
+                                                            result: (sucsess) {
+                                                              if (sucsess) {
+                                                                Navigator.of(context).pop();
+                                                                /* Navigator.pushNamedAndRemoveUntil(
                                               context, HomeScreen.routeName, (
                                               route) => false);*/
-                                                                              Navigation(context, navigatore: NavigatoreTyp.homenav);
-                                                                            } else {
-                                                                              Navigator.of(context).pop();
-                                                                            }
-                                                                          });
-                                                                        } else {
-                                                                          /* Navigator.of(context).pushNamed(
+                                                                Navigation(context, navigatore: NavigatoreTyp.homenav);
+                                                              } else {
+                                                                Navigator.of(context).pop();
+                                                              }
+                                                            });
+                                                      } else {
+                                                        /* Navigator.of(context).pushNamed(
                                         SignupSelectionScreen.routeName,
                                       );*/
-                                                                          Navigation(
-                                                                              context,
-                                                                              name: Routename.SignUpScreen,
-                                                                              navigatore: NavigatoreTyp.Push);
-                                                                        }
-                                                                      } else {
-                                                                        /*Navigator.of(context).pushNamed(
+                                                        Navigation(
+                                                            context,
+                                                            name: Routename.SignUpScreen,
+                                                            navigatore: NavigatoreTyp.Push);
+                                                      }
+                                                    } else {
+                                                      /*Navigator.of(context).pushNamed(
                                       MembershipScreen.routeName,
                                     );*/
-                                                                        Navigation(
-                                                                            context,
-                                                                            name:
-                                                                                Routename.Membership,
-                                                                            navigatore: NavigatoreTyp.Push);
-                                                                      }
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      height:
-                                                                          22,
-                                                                      // width: 178,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        border:
-                                                                            Border(
-                                                                          right: BorderSide(
-                                                                              width: 5.0,
-                                                                              color: ColorCodes.darkgreen),
-                                                                          // bottom: BorderSide(width: 16.0, color: Colors.lightBlue.shade900),
-                                                                        ),
-                                                                        color: ColorCodes
-                                                                            .varcolor,
-                                                                      ),
-                                                                      child:
-                                                                          Row(
+                                                      Navigation(
+                                                          context,
+                                                          name:
+                                                          Routename.Membership,
+                                                          navigatore: NavigatoreTyp.Push);
+                                                    }
+                                                  },
+                                                  child:
+                                                  Container(
+                                                    height:
+                                                    22,
+                                                    // width: 178,
+                                                    decoration:
+                                                    BoxDecoration(
+                                                      border:
+                                                      Border(
+                                                        right: BorderSide(
+                                                            width: 5.0,
+                                                            color: ColorCodes.darkgreen),
+                                                        // bottom: BorderSide(width: 16.0, color: Colors.lightBlue.shade900),
+                                                      ),
+                                                      color: ColorCodes
+                                                          .varcolor,
+                                                    ),
+                                                    child:
+                                                    Row(
 //                        mainAxisAlignment: MainAxisAlignment.center,
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Text(
-                                                                              // S .of(context).membership_price+ " " +//"Membership Price "
-                                                                              Features.iscurrencyformatalign ? widget._itemdata.membershipPrice.toString() + IConstants.currencyFormat : IConstants.currencyFormat + widget._itemdata.membershipPrice.toString() + " Membership Price",
-                                                                              style: TextStyle(fontSize: 9.0, color: ColorCodes.darkgreen, fontWeight: FontWeight.bold)),
-                                                                          /* Spacer(),
+                                                      children: <
+                                                          Widget>[
+                                                        Text(
+                                                          // S .of(context).membership_price+ " " +//"Membership Price "
+                                                            Features.iscurrencyformatalign ? widget._itemdata.membershipPrice.toString() + IConstants.currencyFormat : IConstants.currencyFormat + widget._itemdata.membershipPrice.toString() + " Membership Price",
+                                                            style: TextStyle(fontSize: 9.0, color: ColorCodes.darkgreen, fontWeight: FontWeight.bold)),
+                                                        /* Spacer(),
                                                         Icon(
                                                           Icons.lock,
                                                           color: Colors.black,
@@ -1295,173 +1346,173 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                                           color: Colors.black,
                                                           size: 10,
                                                         ),*/
-                                                                          SizedBox(
-                                                                              width: 5),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  )
-                                                                : SizedBox
-                                                                    .shrink()
-                                                            : SizedBox.shrink(),
+                                                        SizedBox(
+                                                            width: 5),
                                                       ],
                                                     ),
-                                                  !_checkmembership
-                                                      ? widget._itemdata
-                                                              .membershipDisplay!
-                                                          ? SizedBox(
-                                                              height: (Vx.isWeb &&
-                                                                      !ResponsiveLayout
-                                                                          .isSmallScreen(
-                                                                              context))
-                                                                  ? 0
-                                                                  : 1,
-                                                            )
-                                                          : SizedBox(
-                                                              height: (Vx.isWeb &&
-                                                                      !ResponsiveLayout
-                                                                          .isSmallScreen(
-                                                                              context))
-                                                                  ? 0
-                                                                  : 1,
-                                                            )
-                                                      : SizedBox(
-                                                          height: (Vx.isWeb &&
-                                                                  !ResponsiveLayout
-                                                                      .isSmallScreen(
-                                                                          context))
-                                                              ? 0
-                                                              : 1,
-                                                        )
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      )),
-                    ),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 5.0,
-                        right: 5.0,
-                      ),
-                      child: Container(
-                          height: 40,
-                          child: Row(
-                            children: [
-                              Container(
-                                  height: (Features.isSubscription) ? 40 : 40,
-                                  width: _checkmembership ? 180 : 180,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5.0),
-                                    child: CustomeStepper(
-                                      itemdata: widget._itemdata,
-                                      from: "item_screen",
-                                      height:
-                                          (Features.isSubscription) ? 90 : 60,
-                                      addon:
-                                          (widget._itemdata.addon!.length > 0)
-                                              ? widget._itemdata.addon![0]
-                                              : null,
-                                      index: itemindex,
-                                      issubscription: "Add",
-                                      ismember: _checkmembership,
-                                      selectedindex: itemindex,
-                                      onselect: (i) {
-                                        setState(() {
-                                          itemindex = i;
-                                          // Navigator.of(context).pop();
-                                        });
-                                      },
-                                    ),
-                                  )),
-                            ],
-                          )),
-                    ),
-                  ],
-                ),
+                                                  ),
+                                                )
+                                                    : SizedBox
+                                                    .shrink()
+                                                    : SizedBox.shrink(),
+                                              ],
+                                            ),
+                                          !_checkmembership
+                                              ? widget._itemdata
+                                              .membershipDisplay!
+                                              ? SizedBox(
+                                            height: (Vx.isWeb &&
+                                                !ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context))
+                                                ? 0
+                                                : 1,
+                                          )
+                                              : SizedBox(
+                                            height: (Vx.isWeb &&
+                                                !ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context))
+                                                ? 0
+                                                : 1,
+                                          )
+                                              : SizedBox(
+                                            height: (Vx.isWeb &&
+                                                !ResponsiveLayout
+                                                    .isSmallScreen(
+                                                    context))
+                                                ? 0
+                                                : 1,
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    )),
               ),
-            ),
-          )
-        : Card(
-            elevation: 1,
-            margin: EdgeInsets.all(5),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(40),
-              topRight: Radius.circular(15),
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            )),
-            child: Container(
-              // width:  _checkmembership? 230:230.0,
-              width: _checkmembership ? 230 : 230.0,
-              // decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(22)), border: Border.all(color: ColorCodes.backgroundcolor)),
-              //height: MediaQuery.of(context).size.height,//aaaaaaaaaaaaaaaaaa
-              child: Container(
-                //margin: EdgeInsets.only(left: 10.0, top: 5.0, right: 2.0, bottom: 5.0),
-                decoration: new BoxDecoration(
-                  //color: Colors.white,
-                  //border: Border.all(color: Colors.black26),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey[300]!,
-                        blurRadius: 10.0,
-                        offset: Offset(0.0, 0.50)),
-                  ],
+              SizedBox(height: 5),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 5.0,
+                  right: 5.0,
                 ),
-
-                child: Stack(
-                  //mainAxisAlignment: MainAxisAlignment.start,
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Column(
+                child: Container(
+                    height: 40,
+                    child: Row(
                       children: [
-                        //SizedBox(height: 8,),
-                        ItemBadge(
-                          outOfStock: widget._itemdata
-                                      .priceVariation![itemindex].stock! <=
-                                  0
-                              ? OutOfStock(
-                                  singleproduct: false,
-                                )
-                              : null,
-                          badgeDiscount:
-                              BadgeDiscounts(value: margins.toStringAsFixed(0)),
-                          // widgetBadge: WidgetBadge(isdisplay: true,child: widget._itemdata.eligibleForExpress=="0"?Padding(
-                          //   padding: EdgeInsets.only(right: 5.0,),//EdgeInsets.all(3.0),
-                          //   child: Image.asset(Images.express,
-                          //     height: 20.0,
-                          //     width: 25.0,),
-                          // ):SizedBox.shrink()),
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                debugPrint("single product...." +
-                                    {
-                                      "itemid": widget._itemdata.id,
-                                      "itemname": widget._itemdata.itemName,
-                                      "itemimg":
-                                          widget._itemdata.itemFeaturedImage,
-                                      "eligibleforexpress":
-                                          widget._itemdata.eligibleForExpress,
-                                      "delivery": widget._itemdata.delivery,
-                                      "duration": widget._itemdata.duration,
-                                      "durationType": widget._itemdata
-                                          .deliveryDuration.durationType,
-                                      "note": widget
-                                          ._itemdata.deliveryDuration.note,
-                                      "fromScreen": widget._fromScreen,
-                                    }.toString());
-                                /*     Navigator.of(context).pushNamed(
+                        Container(
+                            height: (Features.isSubscription) ? 40 : 40,
+                            width: _checkmembership ? 180 : 180,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 5, right: 5.0),
+                              child: CustomeStepper(
+                                itemdata: widget._itemdata,
+                                from: "item_screen",
+                                height:
+                                (Features.isSubscription) ? 90 : 60,
+                                addon:
+                                (widget._itemdata.addon!.length > 0)
+                                    ? widget._itemdata.addon![0]
+                                    : null,
+                                index: itemindex,
+                                issubscription: "Add",
+                                ismember: _checkmembership,
+                                selectedindex: itemindex,
+                                onselect: (i) {
+                                  setState(() {
+                                    itemindex = i;
+                                    // Navigator.of(context).pop();
+                                  });
+                                },
+                              ),
+                            )),
+                      ],
+                    )),
+              ),
+            ],
+          ),
+        ),
+      ),
+    )
+        : Card(
+      elevation: 1,
+      margin: EdgeInsets.all(5),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(15),
+            bottomLeft: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          )),
+      child: Container(
+        // width:  _checkmembership? 230:230.0,
+        width: _checkmembership ? 230 : 230.0,
+        // decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(22)), border: Border.all(color: ColorCodes.backgroundcolor)),
+        //height: MediaQuery.of(context).size.height,//aaaaaaaaaaaaaaaaaa
+        child: Container(
+          //margin: EdgeInsets.only(left: 10.0, top: 5.0, right: 2.0, bottom: 5.0),
+          decoration: new BoxDecoration(
+            //color: Colors.white,
+            //border: Border.all(color: Colors.black26),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey[300]!,
+                  blurRadius: 10.0,
+                  offset: Offset(0.0, 0.50)),
+            ],
+          ),
+
+          child: Stack(
+            //mainAxisAlignment: MainAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                children: [
+                  //SizedBox(height: 8,),
+                  ItemBadge(
+                    outOfStock: widget._itemdata
+                        .priceVariation![itemindex].stock! <=
+                        0
+                        ? OutOfStock(
+                      singleproduct: false,
+                    )
+                        : null,
+                    badgeDiscount:
+                    BadgeDiscounts(value: margins.toStringAsFixed(0)),
+                    // widgetBadge: WidgetBadge(isdisplay: true,child: widget._itemdata.eligibleForExpress=="0"?Padding(
+                    //   padding: EdgeInsets.only(right: 5.0,),//EdgeInsets.all(3.0),
+                    //   child: Image.asset(Images.express,
+                    //     height: 20.0,
+                    //     width: 25.0,),
+                    // ):SizedBox.shrink()),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          debugPrint("single product...." +
+                              {
+                                "itemid": widget._itemdata.id,
+                                "itemname": widget._itemdata.itemName,
+                                "itemimg":
+                                widget._itemdata.itemFeaturedImage,
+                                "eligibleforexpress":
+                                widget._itemdata.eligibleForExpress,
+                                "delivery": widget._itemdata.delivery,
+                                "duration": widget._itemdata.duration,
+                                "durationType": widget._itemdata
+                                    .deliveryDuration.durationType,
+                                "note": widget
+                                    ._itemdata.deliveryDuration.note,
+                                "fromScreen": widget._fromScreen,
+                              }.toString());
+                          /*     Navigator.of(context).pushNamed(
                                 SingleproductScreen.routeName,
                                 arguments: {
                                   "itemid": widget._itemdata.id.toString(),
@@ -1475,143 +1526,143 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                   "fromScreen":widget._fromScreen,
                                 });*/
 
-                                debugPrint("varid......" +
-                                    widget._itemdata.priceVariation![itemindex]
-                                        .menuItemId
-                                        .toString());
-                                if (widget._fromScreen == "Forget") {
-                                  Navigation(context,
-                                      navigatore: NavigatoreTyp.Pop);
-                                  Navigation(context,
-                                      name: Routename.SingleProduct,
-                                      navigatore: NavigatoreTyp.Push,
-                                      parms: {
-                                        "varid": widget
-                                            ._itemdata
-                                            .priceVariation![itemindex]
-                                            .menuItemId
-                                            .toString(),
-                                        "productId": widget
-                                            ._itemdata
-                                            .priceVariation![itemindex]
-                                            .menuItemId
-                                            .toString()
-                                      });
-                                } else {
-                                  Navigation(context,
-                                      name: Routename.SingleProduct,
-                                      navigatore: NavigatoreTyp.Push,
-                                      parms: {
-                                        "varid": widget
-                                            ._itemdata
-                                            .priceVariation![itemindex]
-                                            .menuItemId
-                                            .toString(),
-                                        "productId": widget
-                                            ._itemdata
-                                            .priceVariation![itemindex]
-                                            .menuItemId
-                                            .toString()
-                                      });
-                                }
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: const Radius.circular(8),
-                                  topRight: const Radius.circular(8),
-                                ),
-                                //margin: EdgeInsets.only(top: 10.0, bottom: 8.0),
-                                child: CachedNetworkImage(
-                                  imageUrl: widget
-                                              ._itemdata
-                                              .priceVariation![itemindex]
-                                              .images!
-                                              .length <=
-                                          0
-                                      ? widget._itemdata.itemFeaturedImage
-                                      : widget
-                                          ._itemdata
-                                          .priceVariation![itemindex]
-                                          .images![0]
-                                          .image,
-                                  errorWidget: (context, url, error) => Image.asset(
-                                      Images.defaultProductImg,
-                                      width:
-                                          230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      height:
-                                          top1 //ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      ),
-                                  placeholder: (context, url) => Image.asset(
-                                      Images.defaultProductImg,
-                                      width:
-                                          230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      height:
-                                          top1 // ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                      ),
-                                  width:
-                                      230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                  height:
-                                      top1, // ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
+                          debugPrint("varid......" +
+                              widget._itemdata.priceVariation![itemindex]
+                                  .menuItemId
+                                  .toString());
+                          if (widget._fromScreen == "Forget") {
+                            Navigation(context,
+                                navigatore: NavigatoreTyp.Pop);
+                            Navigation(context,
+                                name: Routename.SingleProduct,
+                                navigatore: NavigatoreTyp.Push,
+                                parms: {
+                                  "varid": widget
+                                      ._itemdata
+                                      .priceVariation![itemindex]
+                                      .menuItemId
+                                      .toString(),
+                                  "productId": widget
+                                      ._itemdata
+                                      .priceVariation![itemindex]
+                                      .menuItemId
+                                      .toString()
+                                });
+                          } else {
+                            Navigation(context,
+                                name: Routename.SingleProduct,
+                                navigatore: NavigatoreTyp.Push,
+                                parms: {
+                                  "varid": widget
+                                      ._itemdata
+                                      .priceVariation![itemindex]
+                                      .menuItemId
+                                      .toString(),
+                                  "productId": widget
+                                      ._itemdata
+                                      .priceVariation![itemindex]
+                                      .menuItemId
+                                      .toString()
+                                });
+                          }
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(8),
+                            topRight: const Radius.circular(8),
+                          ),
+                          //margin: EdgeInsets.only(top: 10.0, bottom: 8.0),
+                          child: CachedNetworkImage(
+                            imageUrl: widget
+                                ._itemdata
+                                .priceVariation![itemindex]
+                                .images!
+                                .length <=
+                                0
+                                ? widget._itemdata.itemFeaturedImage
+                                : widget
+                                ._itemdata
+                                .priceVariation![itemindex]
+                                .images![0]
+                                .image,
+                            errorWidget: (context, url, error) => Image.asset(
+                                Images.defaultProductImg,
+                                width:
+                                230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                                height:
+                                top1 //ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
                             ),
+                            placeholder: (context, url) => Image.asset(
+                                Images.defaultProductImg,
+                                width:
+                                230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                                height:
+                                top1 // ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                            ),
+                            width:
+                            230, //ResponsiveLayout.isSmallScreen(context) ? 106 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                            height:
+                            top1, // ResponsiveLayout.isSmallScreen(context) ? 100 : ResponsiveLayout.isMediumScreen(context) ? 90 : 100,
+                            fit: BoxFit.fitWidth,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.only(top: top1, bottom: 0.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: ColorCodes.whiteColor,
-                            borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8))),
-                        child: Column(
-                          children: [
-                            //   SizedBox(
-                            //
-                            //   height: 5,
-                            // ),
-                            widget._itemdata.eligibleForExpress == "0"
-                                ? Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 5.0, left: 10),
-                                    child: Container(
-                                      width: 80,
-                                      height: 25,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(3),
-                                        border: Border.all(
-                                            color: ColorCodes.greenColor),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Express",
-                                            style: TextStyle(
-                                                fontSize: 9,
-                                                color: ColorCodes
-                                                    .checkmarginColor),
-                                          ),
-                                          Image.asset(
-                                            Images.express,
-                                            height: 20.0,
-                                            width: 25.0,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox.shrink(),
-                            Row(
-                              children: [
-                                /* SizedBox(
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.only(top: top1, bottom: 0.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: ColorCodes.whiteColor,
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(8),
+                          bottomRight: Radius.circular(8))),
+                  child: Column(
+                    children: [
+                      //   SizedBox(
+                      //
+                      //   height: 5,
+                      // ),
+                      widget._itemdata.eligibleForExpress == "0"
+                          ? Padding(
+                        padding: const EdgeInsets.only(
+                            right: 5.0, left: 10),
+                        child: Container(
+                          width: 80,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            border: Border.all(
+                                color: ColorCodes.greenColor),
+                          ),
+                          child: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.center,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Express",
+                                style: TextStyle(
+                                    fontSize: 9,
+                                    color: ColorCodes
+                                        .checkmarginColor),
+                              ),
+                              Image.asset(
+                                Images.express,
+                                height: 20.0,
+                                width: 25.0,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                          : SizedBox.shrink(),
+                      Row(
+                        children: [
+                          /* SizedBox(
                             width: 10.0,
                           ),
                           Expanded(
@@ -1623,86 +1674,86 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                               ),
                             ),
                           ),*/
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                              ],
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          Expanded(
+                            child: Container(
+                              //color: Colors.black,
+                              height: 50,
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                widget._itemdata.itemName!,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: ResponsiveLayout
+                                        .isSmallScreen(context)
+                                        ? 16
+                                        : ResponsiveLayout.isMediumScreen(
+                                        context)
+                                        ? 12
+                                        : 12,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    //color: Colors.black,
-                                    height: 50,
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: Text(
-                                      widget._itemdata.itemName!,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: ResponsiveLayout
-                                                  .isSmallScreen(context)
-                                              ? 16
-                                              : ResponsiveLayout.isMediumScreen(
-                                                      context)
-                                                  ? 12
-                                                  : 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 5.0,
-                                ),
-                                Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    //child: (widget._itemdata.vegType == "fish" || widget._itemdata.vegType == "meat") ? Image.asset( Images.nonVeg,height: 15, width: 15) : (widget._itemdata.vegType == "standard") ?Image.asset( Images.nonVeg,height: 15, width: 15) : const SizedBox(height: 15, width: 15),
-                                    child: FoodType(
-                                        isVeg: isVeg, isNonVeg: isNonVeg)),
-                                Features.isSubscription &&
-                                        widget._itemdata
-                                                .eligibleForSubscription ==
-                                            "0"
-                                    ? Container(
-                                        height: (Vx.isWeb) ? 35 : 35,
-                                        width: (Vx.isWeb) ? 85 : 85,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 0, right: 5.0),
-                                          child: CustomeStepper(
-                                            priceVariation: widget._itemdata
-                                                .priceVariation![itemindex],
-                                            itemdata: widget._itemdata,
-                                            from: "item_screen",
-                                            height: (Features.isSubscription)
-                                                ? 90
-                                                : 60,
-                                            issubscription: "Subscribe",
-                                            addon: (widget._itemdata.addon!
-                                                        .length >
-                                                    0)
-                                                ? widget._itemdata.addon![0]
-                                                : null,
-                                            index: itemindex,
-                                            ismember: _checkmembership,
-                                            selectedindex: itemindex,
-                                            onselect: (i) {
-                                              setState(() {
-                                                itemindex = i;
-                                                // Navigator.of(context).pop();
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : SizedBox.shrink(),
-                              ],
+                          ),
+                          SizedBox(
+                            width: 5.0,
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              //child: (widget._itemdata.vegType == "fish" || widget._itemdata.vegType == "meat") ? Image.asset( Images.nonVeg,height: 15, width: 15) : (widget._itemdata.vegType == "standard") ?Image.asset( Images.nonVeg,height: 15, width: 15) : const SizedBox(height: 15, width: 15),
+                              child: FoodType(
+                                  isVeg: isVeg, isNonVeg: isNonVeg)),
+                          Features.isSubscription &&
+                              widget._itemdata
+                                  .eligibleForSubscription ==
+                                  "0"
+                              ? Container(
+                            height: (Vx.isWeb) ? 35 : 35,
+                            width: (Vx.isWeb) ? 85 : 85,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 0, right: 5.0),
+                              child: CustomeStepper(
+                                priceVariation: widget._itemdata
+                                    .priceVariation![itemindex],
+                                itemdata: widget._itemdata,
+                                from: "item_screen",
+                                height: (Features.isSubscription)
+                                    ? 90
+                                    : 60,
+                                issubscription: "Subscribe",
+                                addon: (widget._itemdata.addon!
+                                    .length >
+                                    0)
+                                    ? widget._itemdata.addon![0]
+                                    : null,
+                                index: itemindex,
+                                ismember: _checkmembership,
+                                selectedindex: itemindex,
+                                onselect: (i) {
+                                  setState(() {
+                                    itemindex = i;
+                                    // Navigator.of(context).pop();
+                                  });
+                                },
+                              ),
                             ),
-                            // Spacer(),
+                          )
+                              : SizedBox.shrink(),
+                        ],
+                      ),
+                      // Spacer(),
 
 //               Row(
 //                 children: <Widget>[
@@ -1793,111 +1844,111 @@ class _ItemsState extends State<Itemsv2> with Navigations {
 //               SizedBox(
 //                 height: 2,
 //               ),
-                            (Features.netWeight &&
-                                    widget._itemdata.vegType == "fish")
-                                ? Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 8.0,
-                                      ),
-                                      Text(
-                                        Features.iscurrencyformatalign
-                                            ? "Whole Uncut:" +
-                                                " " +
-                                                widget._itemdata.salePrice! +
-                                                IConstants.currencyFormat +
-                                                " / " +
-                                                "500 G"
-                                            : "Whole Uncut:" +
-                                                " " +
-                                                IConstants.currencyFormat +
-                                                widget._itemdata.salePrice! +
-                                                " / " +
-                                                "500 G",
-                                        style: new TextStyle(
-                                            fontSize: ResponsiveLayout
-                                                    .isSmallScreen(context)
-                                                ? 10
-                                                : ResponsiveLayout
-                                                        .isMediumScreen(context)
-                                                    ? 11
-                                                    : 11,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        width: 10.0,
-                                      ),
-                                    ],
-                                  )
-                                : SizedBox.shrink(),
-                            /*SizedBox(
+                      (Features.netWeight &&
+                          widget._itemdata.vegType == "fish")
+                          ? Row(
+                        children: [
+                          SizedBox(
+                            width: 8.0,
+                          ),
+                          Text(
+                            Features.iscurrencyformatalign
+                                ? "Whole Uncut:" +
+                                " " +
+                                widget._itemdata.salePrice! +
+                                IConstants.currencyFormat +
+                                " / " +
+                                "500 G"
+                                : "Whole Uncut:" +
+                                " " +
+                                IConstants.currencyFormat +
+                                widget._itemdata.salePrice! +
+                                " / " +
+                                "500 G",
+                            style: new TextStyle(
+                                fontSize: ResponsiveLayout
+                                    .isSmallScreen(context)
+                                    ? 10
+                                    : ResponsiveLayout
+                                    .isMediumScreen(context)
+                                    ? 11
+                                    : 11,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                        ],
+                      )
+                          : SizedBox.shrink(),
+                      /*SizedBox(
                       height: 5,
                     ),*/
-                            (Features.netWeight &&
-                                    widget._itemdata.vegType == "fish")
-                                ? SizedBox(
-                                    height: 2,
-                                  )
-                                : SizedBox
-                                    .shrink() /*SizedBox(
+                      (Features.netWeight &&
+                          widget._itemdata.vegType == "fish")
+                          ? SizedBox(
+                        height: 2,
+                      )
+                          : SizedBox
+                          .shrink() /*SizedBox(
                     height: 2,
               )*/
-                            ,
-                            (Features.netWeight &&
-                                    widget._itemdata.vegType == "fish")
-                                ? Row(children: [
-                                    SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            "G Weight:" +
-                                                " " +
-                                                /*'$weight '*/ widget
-                                                    ._itemdata
-                                                    .priceVariation![itemindex]
-                                                    .weight!,
-                                            style: new TextStyle(
-                                                fontSize: ResponsiveLayout
-                                                        .isSmallScreen(context)
-                                                    ? 10
-                                                    : ResponsiveLayout
-                                                            .isMediumScreen(
-                                                                context)
-                                                        ? 11
-                                                        : 11,
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    SizedBox(width: 5),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                            "N Weight:" +
-                                                " " +
-                                                /*'$netWeight '*/ widget
-                                                    ._itemdata
-                                                    .priceVariation![itemindex]
-                                                    .netWeight!,
-                                            style: new TextStyle(
-                                                fontSize: ResponsiveLayout
-                                                        .isSmallScreen(context)
-                                                    ? 10
-                                                    : ResponsiveLayout
-                                                            .isMediumScreen(
-                                                                context)
-                                                        ? 11
-                                                        : 11,
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    SizedBox(width: 10),
-                                  ])
-                                : /*SizedBox(height: 5,)*/ SizedBox.shrink(),
-                            /*
+                      ,
+                      (Features.netWeight &&
+                          widget._itemdata.vegType == "fish")
+                          ? Row(children: [
+                        SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                "G Weight:" +
+                                    " " +
+                                    /*'$weight '*/ widget
+                                    ._itemdata
+                                    .priceVariation![itemindex]
+                                    .weight!,
+                                style: new TextStyle(
+                                    fontSize: ResponsiveLayout
+                                        .isSmallScreen(context)
+                                        ? 10
+                                        : ResponsiveLayout
+                                        .isMediumScreen(
+                                        context)
+                                        ? 11
+                                        : 11,
+                                    fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        SizedBox(width: 5),
+                        Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                                "N Weight:" +
+                                    " " +
+                                    /*'$netWeight '*/ widget
+                                    ._itemdata
+                                    .priceVariation![itemindex]
+                                    .netWeight!,
+                                style: new TextStyle(
+                                    fontSize: ResponsiveLayout
+                                        .isSmallScreen(context)
+                                        ? 10
+                                        : ResponsiveLayout
+                                        .isMediumScreen(
+                                        context)
+                                        ? 11
+                                        : 11,
+                                    fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        SizedBox(width: 10),
+                      ])
+                          : /*SizedBox(height: 5,)*/ SizedBox.shrink(),
+                      /*
                       ( widget._itemdata.priceVariation!.length > 1)
                           ? Features.btobModule?
                       Container(
@@ -2208,7 +2259,7 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                       ),
 
                        */
-                            /*
+                      /*
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -2217,7 +2268,7 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                         ],
                       ),
                       */
-                            /*
+                      /*
                       SizedBox(height:5),
 
                       Padding(
@@ -2427,106 +2478,106 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                       ),
                       */
 
-                            (widget._itemdata.item_description != null &&
-                                    widget._itemdata.item_description != "")
-                                ? SizedBox(
-                                    height: 30,
-                                    child: Row(
-                                      children: [
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            widget._itemdata.item_description!,
-                                            overflow: TextOverflow.ellipsis,
-                                            //softWrap: true,
-                                            //maxLines: 2,
-                                            style: TextStyle(
-                                                color: ColorCodes.blackColor,
-                                                fontSize: ResponsiveLayout
-                                                        .isSmallScreen(context)
-                                                    ? 10
-                                                    : ResponsiveLayout
-                                                            .isMediumScreen(
-                                                                context)
-                                                        ? 13
-                                                        : 13),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10.0,
-                                        ),
-                                      ],
+                      (widget._itemdata.item_description != null &&
+                          widget._itemdata.item_description != "")
+                          ? SizedBox(
+                        height: 30,
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                widget._itemdata.item_description!,
+                                overflow: TextOverflow.ellipsis,
+                                //softWrap: true,
+                                //maxLines: 2,
+                                style: TextStyle(
+                                    color: ColorCodes.blackColor,
+                                    fontSize: ResponsiveLayout
+                                        .isSmallScreen(context)
+                                        ? 10
+                                        : ResponsiveLayout
+                                        .isMediumScreen(
+                                        context)
+                                        ? 13
+                                        : 13),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                          ],
+                        ),
+                      )
+                          : const SizedBox(height: 35),
+                      // Text( widget._itemdata.item_description != null ? widget._itemdata.item_description!.substring(0,widget._itemdata.item_description!.length > 30 ?  30 : widget._itemdata.item_description!.length) + "...More" : "", style:TextStyle(fontSize: 10,color: ColorCodes.whiteColor,fontWeight: FontWeight.bold)),
+                      // SizedBox(height:10),
+                      Container(
+                        padding: const EdgeInsets.only(
+                            left: 10.0, right: 10.0, bottom: 8),
+                        height: 40,
+                        child: Row(
+                          mainAxisAlignment:
+                          widget._itemdata.addon!.length > 0
+                              ? MainAxisAlignment.spaceBetween
+                              : MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                widget._itemdata.addon!.length > 0
+                                    ? Text('Customize',
+                                    style: TextStyle(
+                                        fontSize: 8,
+                                        color: ColorCodes.blackColor,
+                                        fontWeight:
+                                        FontWeight.normal))
+                                    : const SizedBox(height: 12),
+                                const SizedBox(height: 2),
+                                RichText(
+                                  text: new TextSpan(
+                                    style: new TextStyle(
+                                      fontSize: ResponsiveLayout
+                                          .isSmallScreen(context)
+                                          ? 14
+                                          : ResponsiveLayout
+                                          .isMediumScreen(context)
+                                          ? 15
+                                          : 16,
+                                      color: Colors.black,
                                     ),
-                                  )
-                                : const SizedBox(height: 35),
-                            // Text( widget._itemdata.item_description != null ? widget._itemdata.item_description!.substring(0,widget._itemdata.item_description!.length > 30 ?  30 : widget._itemdata.item_description!.length) + "...More" : "", style:TextStyle(fontSize: 10,color: ColorCodes.whiteColor,fontWeight: FontWeight.bold)),
-                            // SizedBox(height:10),
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  left: 10.0, right: 10.0, bottom: 8),
-                              height: 40,
-                              child: Row(
-                                mainAxisAlignment:
-                                    widget._itemdata.addon!.length > 0
-                                        ? MainAxisAlignment.spaceBetween
-                                        : MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      widget._itemdata.addon!.length > 0
-                                          ? Text('Customize',
-                                              style: TextStyle(
-                                                  fontSize: 8,
-                                                  color: ColorCodes.blackColor,
-                                                  fontWeight:
-                                                      FontWeight.normal))
-                                          : const SizedBox(height: 12),
-                                      const SizedBox(height: 2),
-                                      RichText(
-                                        text: new TextSpan(
-                                          style: new TextStyle(
-                                            fontSize: ResponsiveLayout
-                                                    .isSmallScreen(context)
-                                                ? 14
-                                                : ResponsiveLayout
-                                                        .isMediumScreen(context)
-                                                    ? 15
-                                                    : 16,
-                                            color: Colors.black,
-                                          ),
-                                          children: <TextSpan>[
+                                    children: <TextSpan>[
 //                            if(varmemberprice.toString() == varmrp.toString())
 
-                                            new TextSpan(
-                                                text:
-                                                    //'${_checkmembership?widget.itemdata!.priceVariation![itemindex].membershipPrice:widget.itemdata!.priceVariation![itemindex].price} ' + IConstants.currencyFormat:
-                                                    Features.iscurrencyformatalign
+                                      new TextSpan(
+                                          text: _priceDisplay,
+                                          //'${_checkmembership?widget.itemdata!.priceVariation![itemindex].membershipPrice:widget.itemdata!.priceVariation![itemindex].price} ' + IConstants.currencyFormat:
+                                          /* Features.iscurrencyformatalign
                                                         ? '${_checkmembership ? widget._itemdata.priceVariation![itemindex].membershipPrice : widget._itemdata.priceVariation![itemindex].price} ' +
                                                             IConstants
                                                                 .currencyFormat
                                                         : IConstants
                                                                 .currencyFormat +
-                                                            '${_checkmembership ? widget._itemdata.priceVariation![itemindex].membershipPrice : widget._itemdata.priceVariation![itemindex].price} ',
-                                                style: new TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: _checkmembership
-                                                      ? ColorCodes.greenColor
-                                                      : Colors.black,
-                                                  fontSize: ResponsiveLayout
-                                                          .isSmallScreen(
-                                                              context)
-                                                      ? 15
-                                                      : ResponsiveLayout
-                                                              .isMediumScreen(
-                                                                  context)
-                                                          ? 15
-                                                          : 16,
-                                                )),
-                                            new TextSpan(
-                                                text: widget
+                                                            '${_checkmembership ? widget._itemdata.priceVariation![itemindex].membershipPrice : widget._itemdata.priceVariation![itemindex].price} ',*/
+                                          style: new TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: _checkmembership
+                                                ? ColorCodes.greenColor
+                                                : Colors.black,
+                                            fontSize: ResponsiveLayout
+                                                .isSmallScreen(
+                                                context)
+                                                ? 15
+                                                : ResponsiveLayout
+                                                .isMediumScreen(
+                                                context)
+                                                ? 15
+                                                : 16,
+                                          )),
+                                      new TextSpan(
+                                          text: _mrpDisplay,/*widget
                                                             ._itemdata
                                                             .priceVariation![
                                                                 itemindex]
@@ -2542,76 +2593,76 @@ class _ItemsState extends State<Itemsv2> with Navigations {
                                                             IConstants
                                                                 .currencyFormat
                                                         : '${_checkmembership ? widget._itemdata.priceVariation![itemindex].membershipDisplay! ? IConstants.currencyFormat + widget._itemdata.priceVariation![itemindex].mrp! : "" : ""}'
-                                                    : "",
-                                                style: TextStyle(
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
-                                                  fontSize: ResponsiveLayout
-                                                          .isSmallScreen(
-                                                              context)
-                                                      ? 10
-                                                      : ResponsiveLayout
-                                                              .isMediumScreen(
-                                                                  context)
-                                                          ? 13
-                                                          : 14,
-                                                )),
-                                          ],
-                                        ),
-                                      ),
-                                      _checkmembership
-                                          ? Text(
-                                              " Membership Price",
-                                              style: TextStyle(
-                                                  color: ColorCodes.greenColor,
-                                                  fontSize: 7),
-                                            )
-                                          : SizedBox.shrink(),
+                                                    : "",*/
+                                          style: TextStyle(
+                                            decoration: TextDecoration
+                                                .lineThrough,
+                                            fontSize: ResponsiveLayout
+                                                .isSmallScreen(
+                                                context)
+                                                ? 10
+                                                : ResponsiveLayout
+                                                .isMediumScreen(
+                                                context)
+                                                ? 13
+                                                : 14,
+                                          )),
                                     ],
                                   ),
-                                  Container(
-                                    height: (Features.isSubscription) ? 40 : 40,
-                                    width: _checkmembership ? 100 : 100,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 2, right: 0.0),
-                                      child: CustomeStepper(
-                                        priceVariation: widget._itemdata
-                                            .priceVariation![itemindex],
-                                        itemdata: widget._itemdata,
-                                        from: "item_screen",
-                                        height:
-                                            (Features.isSubscription) ? 90 : 40,
-                                        issubscription: "Add",
-                                        addon:
-                                            (widget._itemdata.addon!.length > 0)
-                                                ? widget._itemdata.addon![0]
-                                                : null,
-                                        index: itemindex,
-                                        showPrice: false,
-                                        ismember: _checkmembership,
-                                        selectedindex: itemindex,
-                                        onselect: (i) {
-                                          setState(() {
-                                            itemindex = i;
-                                            // Navigator.of(context).pop();
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
+                                _checkmembership
+                                    ? Text(
+                                  " Membership Price",
+                                  style: TextStyle(
+                                      color: ColorCodes.greenColor,
+                                      fontSize: 7),
+                                )
+                                    : SizedBox.shrink(),
+                              ],
+                            ),
+                            Container(
+                              height: (Features.isSubscription) ? 40 : 40,
+                              width: _checkmembership ? 100 : 100,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 2, right: 0.0),
+                                child: CustomeStepper(
+                                  priceVariation: widget._itemdata
+                                      .priceVariation![itemindex],
+                                  itemdata: widget._itemdata,
+                                  from: "item_screen",
+                                  height:
+                                  (Features.isSubscription) ? 90 : 40,
+                                  issubscription: "Add",
+                                  addon:
+                                  (widget._itemdata.addon!.length > 0)
+                                      ? widget._itemdata.addon![0]
+                                      : null,
+                                  index: itemindex,
+                                  showPrice: false,
+                                  ismember: _checkmembership,
+                                  selectedindex: itemindex,
+                                  onselect: (i) {
+                                    setState(() {
+                                      itemindex = i;
+                                      // Navigator.of(context).pop();
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          );
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -2626,7 +2677,7 @@ class FoodType extends StatelessWidget {
     return isNonVeg
         ? Image.asset(Images.nonVeg, height: 15, width: 15)
         : isVeg
-            ? Image.asset(Images.veg, height: 15, width: 15)
-            : const SizedBox(height: 15, width: 15);
+        ? Image.asset(Images.veg, height: 15, width: 15)
+        : const SizedBox(height: 15, width: 15);
   }
 }

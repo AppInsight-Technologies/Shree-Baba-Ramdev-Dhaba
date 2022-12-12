@@ -220,7 +220,7 @@ class CategoriesItem extends StatelessWidget with Navigations {
                             style: TextStyle(
                                 //color: ColorCodes.whiteColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16),
+                                fontSize: 14),
                           ),
                         ),
                         // Padding(

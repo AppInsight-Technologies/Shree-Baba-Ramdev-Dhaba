@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 import '../../constants/IConstants.dart';
 import '../../constants/features.dart';
 
@@ -10,7 +8,6 @@ class ItemData {
   var deliveryDuration;
   String? eligibleForSubscription;
   List<SubscriptionSlot>? subscriptionSlot;
-  //var subscriptionSlot;
   String? paymentMode;
   String? duration;
   String? categoryId;
@@ -29,7 +26,6 @@ class ItemData {
   String? type;
   List<PriceVariation>? priceVariation=[];
   int? replacement;
-  // var deliveryDuration;
   String? delivery;
   String? mode;
   String? membershipId;
@@ -149,14 +145,12 @@ class ItemData {
     mode=(json['mode']??"0");
     loyalty = json['loyalty'];
     netWeight = json['net_weight'];
-   // debugPrint("json['price'].toString()..."+json['price'].toString().toString());
     if(json['type']=="1") {
       price = (IConstants.numberFormat == "1") ? double.parse(json['price'].toString())
           .toStringAsFixed(0) : double.parse(json['price'].toString())
           .toStringAsFixed(IConstants.decimaldigit);
     }
-    // print("price..."+json['price'].toString());
-    // print("price"+price.toString());
+
     priority = json['priority'];
     if(json['type']=="1") {
       mrp = (IConstants.numberFormat == "1") ? double.parse(json['mrp'].toString())
@@ -186,8 +180,9 @@ class ItemData {
         discointDisplay = true;
       }
     }
+
     if(json['type']=="1") {
-      if (json['membership_price'] == '-' || json['membership_price'] == "0" ||
+      if (json['membership_price'] == '-' || json['membership_price'] == 0 ||
           json['membership_price'] == json['mrp']
           || json['membership_price'] == json['price']) {
         membershipDisplay = false;
@@ -195,15 +190,11 @@ class ItemData {
         membershipDisplay = true;
       }
     }
-
-      singleshortNote = json['singleshortNote']??"";
-    //
+    singleshortNote = json['singleshortNote']??"";
     if(json['type']=="0") {
       if (json['price_variation'] != null) {
-        // print("variation: ${json['price_variation']}");
         priceVariation = <PriceVariation>[];
         json['price_variation'].forEach((v) {
-          // v["type"] = type;
           v.addAll({
             "type": type
           });
@@ -372,6 +363,7 @@ class SubscriptionSlot {
   String? weekday;
   String? weekdayDays;
   String? custom;
+  String? alternativeDays;
   String? customDays;
   String? ref;
   String? deliveries;
@@ -390,6 +382,7 @@ class SubscriptionSlot {
         this.weekday,
         this.weekdayDays,
         this.custom,
+        this.alternativeDays,
         this.customDays,
         this.ref,
         this.deliveries});
@@ -408,6 +401,7 @@ class SubscriptionSlot {
     weekday = json['weekday'];
     weekdayDays = json['weekdayDays'];
     custom = json['custom'];
+    alternativeDays = json['alternate_days'];
     customDays = json['customDays'];
     ref = json['ref'];
     deliveries = json['deliveries'];
@@ -428,6 +422,7 @@ class SubscriptionSlot {
     data['weekday'] = this.weekday;
     data['weekdayDays'] = this.weekdayDays;
     data['custom'] = this.custom;
+    data['alternate_days'] = this.alternativeDays;
     data['customDays'] = this.customDays;
     data['ref'] = this.ref;
     data['deliveries'] = this.deliveries;
@@ -457,7 +452,6 @@ class PriceVariation {
   bool? discointDisplay = false;
   bool? membershipDisplay = false;
   String? mode;
-  //AddOn? addon;
 
   PriceVariation(
       {this.loyalty,
@@ -481,7 +475,6 @@ class PriceVariation {
         this.membershipDisplay,
         this.discointDisplay,
         this.mode,
-        // this.addon
       });
 
   PriceVariation.fromJson(Map<String, dynamic> json) {
@@ -490,10 +483,7 @@ class PriceVariation {
     id = json['id'];
     menuItemId = json['menu_item_id'];
     variationName = json['variation_name'];
-    // addon = json['addon'];
     price = (IConstants.numberFormat == "1")?double.parse(json['price'].toString()).toStringAsFixed(0):double.parse(json['price'].toString()).toStringAsFixed(IConstants.decimaldigit);
-    // print("price..."+json['price'].toString());
-    // print("price"+price.toString());
     priority = json['priority'];
     mrp = (IConstants.numberFormat == "1")?double.parse(json['mrp'].toString()).toStringAsFixed(0):double.parse(json['mrp'].toString()).toStringAsFixed(IConstants.decimaldigit);
     stock = json["type"]=="0"?double.parse(json['stock'].toString()):double.parse(json['stock_double'].toString());
@@ -514,7 +504,7 @@ class PriceVariation {
     } else {
       discointDisplay = true;
     }
-    if(json['membership_price'] == '-' || json['membership_price'] == "0" || json['membership_price'] == json['mrp']
+    if(json['membership_price'] == '-' || double.parse(json['membership_price'].toString()) <= 0 || json['membership_price'] == json['mrp']
         || json['membership_price'] == json['price']) {
       membershipDisplay = false;
     } else {
@@ -541,7 +531,6 @@ class PriceVariation {
     data['status'] = this.status;
     data['min_item'] = this.minItem;
     data['membership_price'] = this.membershipPrice;
-    // data['addon'] = this.addon;
     data['loyaltys'] = this.loyaltys;
     if (this.images != null) {
       data['images'] = this.images!.map((v) => v.toJson()).toList();
@@ -812,9 +801,9 @@ class Promocode {
   String? appliedFor;
 
   Promocode({ this.id,
-     this.promocode,
-     this.description,
-     this.appliedFor});
+    this.promocode,
+    this.description,
+    this.appliedFor});
 
   Promocode.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -889,13 +878,15 @@ class Data {
 class Reviews {
   String? comment;
   String? user;
+  String? star;
   String? purchased_verified;
 
-  Reviews({this.comment, this.user, this.purchased_verified});
+  Reviews({this.comment, this.user,this.star, this.purchased_verified});
 
   Reviews.fromJson(Map<String, dynamic> json) {
     comment = json['comment'];
     user = json['user'];
+    star = json['star'];
     purchased_verified = json['purchased_verified'];
   }
 
@@ -903,6 +894,7 @@ class Reviews {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['comment'] = this.comment;
     data['user'] = this.user;
+    data['star'] = this.star;
     data['purchased_verified']= this.purchased_verified;
     return data;
   }

@@ -50,11 +50,11 @@ class CustomBottomNavigationBar extends StatelessWidget with Navigations {
         '/store/home' == ModalRoute.of(context)?.settings.name;
     return Container(
       // margin: const EdgeInsets.all(10.0),
-      margin: const EdgeInsets.only(left: 10, right: 10),
+      margin: const EdgeInsets.only(left: 5, right: 5),
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(10.0)),
           color: ColorCodes.bottomBar),
-      height: 50,
+      height: 65,
       child: Row(
         children: <Widget>[
           const Spacer(),

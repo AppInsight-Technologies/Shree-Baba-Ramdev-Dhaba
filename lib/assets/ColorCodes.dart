@@ -39,8 +39,8 @@ class ColorCodes {
   static Color darkblue = Color(0xff012961);
   static Color mediumBlueColor = Color(0xff2966A2);
   static Color lightBlueColor = IConstants.isEnterprise
-      ? Color(0xff005047)
-      : Color(0xff005047); //bottomnavigation color change
+      ? Color(0xff21A954)
+      : Color(0xff21A954); //bottomnavigation color change
   static Color lightskybluecolor = Color(0xFFC2E7F9);
 
   static Color lightColor = Color(0xffebf4ff);
@@ -60,7 +60,7 @@ class ColorCodes {
 
   static Color slotTab = Color(0xFFF3F9FF);
   static Color backgroundcolor = Color(0xffF8F8F8);
-  static Color darkestgreen = Color(0xff035733);
+  static Color darkestgreen = Color(0xff21A954);
   static Color darkgreen = Color(0xff32B847);
   static Color discount = Color(0xff32B847);
   static Color cyanColor = Color(0xffB9FFC4);
@@ -89,12 +89,12 @@ class ColorCodes {
       IConstants.isEnterprise ? Color(0xffF0F4F8) : Colors.white;
   //static Color primaryColor = IConstants.isEnterprise ? Color(0xff005047) : Colors.white;
   static Color primaryColor1 =
-      IConstants.isEnterprise ? Color(0xff3D5669) : Colors.white;
+      IConstants.isEnterprise ? Color(0xff21A954) : Colors.white;
   static Color primaryColor =
-      IConstants.isEnterprise ? Color(0xff0A5047) : Colors.white;
+      IConstants.isEnterprise ? Color(0xff21A954) : Colors.white;
   //static Color accentColor = IConstants.isEnterprise ? Color(0xff005047) : Colors.white;
   static Color accentColor =
-      IConstants.isEnterprise ? Color(0xff0A5047) : Colors.white;
+      IConstants.isEnterprise ? Color(0xff21A954) : Colors.white;
   static Color searchText = IConstants.isEnterprise ? blackColor : blackColor;
   static Color searchIcon = IConstants.isEnterprise ? blackColor : blackColor;
   static Color menuColor = IConstants.isEnterprise ? blackColor : blackColor;

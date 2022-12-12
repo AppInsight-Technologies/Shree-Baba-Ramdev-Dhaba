@@ -96,7 +96,7 @@ class _BottomNaviagationState  extends State<BottomNaviagation> {
               cursor: SystemMouseCursors.click,
               child: Container(
                 height: 80,
-                padding: EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 10),
+                padding: EdgeInsets.only(left: 5, top: 10, right: 5, bottom: 10),
                 color: ColorCodes.whiteColor,
                 width: MediaQuery.of(context).size.width,
                 child: GestureDetector(
